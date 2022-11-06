@@ -10,7 +10,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-@Service
+@Service("jwtService")
 public class JwtServiceImpl implements JwtService {
 
     private String secretKet = "secretKetsecretKetsecretKetsecretKetsecretKetsecretKetsecretKet";
@@ -45,11 +45,25 @@ public class JwtServiceImpl implements JwtService {
                 Key signKey = new SecretKeySpec(secretByteKey, SignatureAlgorithm.HS256.getJcaName());
                 return Jwts.parserBuilder().setSigningKey(signKey).build().parseClaimsJws(token).getBody();
             } catch (ExpiredJwtException e) {
-
+                // 만료됨
             } catch (JwtException e) {
-
+                // 유효하지 않음
             }
         }
         return null;
+    }
+
+    @Override
+    public boolean isValid(String token) {
+        return this.getClaims(token) != null;
+    }
+
+    @Override
+    public int getId(String token) {
+        Claims claims = this.getClaims(token);
+        if(claims != null) {
+            return Integer.parseInt(claims.get("id").toString());
+        }
+        return 0;
     }
 }
